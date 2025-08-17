@@ -1,0 +1,24 @@
+{
+  "originHash" : "aed9ec97eb48a5621a778fdd1139216754b0d7d14680ba3a3f9cfd3b3db4ba24",
+  "pins" : [
+    {
+      "identity" : "stripe-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/stripe/stripe-ios",
+      "state" : {
+        "revision" : "054101491cbd4e1cc712f3c618c37a93c9e9f2bd",
+        "version" : "24.20.0"
+      }
+    },
+    {
+      "identity" : "stripe-terminal-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/stripe/stripe-terminal-ios.git",
+      "state" : {
+        "revision" : "50d11db302e009ebb29d00eddd4384f2d88a0999",
+        "version" : "4.6.1"
+      }
+    }
+  ],
+  "version" : 3
+}
