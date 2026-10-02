@@ -1,0 +1,13 @@
+{
+  "id": "boi",
+  "swiftConfiguration": "bankOfIreland",
+  "primaryColor": "#0033CC",
+  "appIcon": {
+    "backgroundColor": "#0033CC",
+    "logoTreatment": "white"
+  },
+  "launch": {
+    "backgroundColor": "#0033CC",
+    "logoTreatment": "white"
+  }
+}

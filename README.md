@@ -63,24 +63,34 @@ A professional banking demo app showcasing Stripe Terminal and Connect integrati
 
 ### Switching Banks
 
-Change the active bank in `BankDemo/Configuration/BankConfiguration.swift`:
+Use the brand selector before opening or building the Xcode project:
 
-```swift
-extension BankConfiguration {
-    // Change this line to switch between different banks
-    static let current = BankConfiguration.hsbc  // or .lloyds, .barclays
-}
+```bash
+./scripts/select-brand boi
+# or
+./scripts/select-brand hsbc
+```
+
+The selector updates the checked-in app icon, launch logo and colour, in-app
+logo, and generated `BankConfiguration.current` selection. Review and commit
+those generated changes when changing the repository default. To verify that
+the generated files match a brand without changing anything, run:
+
+```bash
+./scripts/select-brand boi --check
 ```
 
 ### Available Banks
 
 - **HSBC**: Red theme (`#C92B23`)
-- **Lloyds**: Green theme (`#006241`)
-- **Barclays**: Blue theme (`#00AEEF`)
+- **Bank of Ireland**: Blue theme (`#0033CC`)
+
+Lloyds and Barclays have in-app theme definitions but do not yet have complete
+icon and launch asset bundles, so they are not accepted by the selector.
 
 ### Adding New Banks
 
-1. **Add Bank Configuration**
+1. **Add the in-app bank configuration**
 
    ```swift
    static let yourBank = BankConfiguration(
@@ -96,10 +106,21 @@ extension BankConfiguration {
    )
    ```
 
-2. **Update Current Configuration**
-   ```swift
-   static let current = BankConfiguration.yourBank
+2. **Add a brand asset bundle**
+
+   Create `Branding/your-bank/brand.json` and `logo.png`. The manifest names the
+   Swift configuration and controls the app-icon and launch-logo background and
+   whether the logo is rendered in its original colours or white.
+
+3. **Generate and verify the selected brand**
+
+   ```bash
+   ./scripts/select-brand your-bank
+   ./scripts/select-brand your-bank --check
    ```
+
+   Build the app and visually verify the home-screen icon, native launch screen,
+   and in-app branding.
 
 ### Theme Properties
 

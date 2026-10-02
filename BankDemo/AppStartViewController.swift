@@ -7,62 +7,7 @@
 
 import UIKit
 import StripeConnect
-import Foundation
 import Stripe
-
-// Local definitions until Utils classes are properly included in project
-@MainActor
-final class LocalBrandingManager: @unchecked Sendable {
-    static let shared = LocalBrandingManager()
-    private var _primaryColor: UIColor?
-    
-    private init() {}
-    
-    var primaryColor: UIColor {
-        return _primaryColor ?? UIColor.systemBlue
-    }
-    
-    func configure(with appInfo: AppInfo) {
-        if let primaryColorHex = appInfo.primaryColor {
-            _primaryColor = UIColor(hex: primaryColorHex)
-        }
-    }
-}
-
-@MainActor  
-final class LocalImageLoader: @unchecked Sendable {
-    static let shared = LocalImageLoader()
-    private let cache = NSCache<NSString, UIImage>()
-    private let session = URLSession.shared
-    
-    private init() {
-        cache.countLimit = 100
-    }
-    
-    func loadImage(from urlString: String?) async -> UIImage? {
-        guard let urlString = urlString,
-              let url = URL(string: urlString) else {
-            return nil
-        }
-        
-        if let cachedImage = cache.object(forKey: urlString as NSString) {
-            return cachedImage
-        }
-        
-        do {
-            let (data, _) = try await session.data(from: url)
-            guard let image = UIImage(data: data) else {
-                return nil
-            }
-            
-            cache.setObject(image, forKey: urlString as NSString)
-            return image
-        } catch {
-            print("Error loading image from \(urlString): \(error)")
-            return nil
-        }
-    }
-}
 
 class AppStartViewController: UIViewController {
     
@@ -76,7 +21,7 @@ class AppStartViewController: UIViewController {
             outgoing.font = .systemFont(ofSize: 16, weight: .medium)
             return outgoing
         }
-        config.baseBackgroundColor = LocalBrandingManager.shared.primaryColor
+        config.baseBackgroundColor = BankConfiguration.current.primaryColor
         config.cornerStyle = .medium
         config.contentInsets = NSDirectionalEdgeInsets(top: 12, leading: 24, bottom: 12, trailing: 24)
         
@@ -93,12 +38,13 @@ class AppStartViewController: UIViewController {
     }
     
     private func setupUI() {
-        view.backgroundColor = BankConfiguration.current.primaryColor
+        view.backgroundColor = UIColor(named: "SelectedLaunchBackground")
+            ?? BankConfiguration.current.primaryColor
         
         // Logo image view
         logoImageView.translatesAutoresizingMaskIntoConstraints = false
         logoImageView.contentMode = .scaleAspectFit
-        logoImageView.isHidden = true // Initially hidden until loaded
+        logoImageView.image = UIImage(named: "SelectedLaunchLogo")
         view.addSubview(logoImageView)
         
         // Activity indicator
@@ -167,18 +113,6 @@ class AppStartViewController: UIViewController {
                 // Set the publishable key dynamically
                 STPAPIClient.shared.publishableKey = appInfo.publishableKey
                 
-                // Configure branding (colors, logo, etc.)
-                LocalBrandingManager.shared.configure(with: appInfo)
-                
-                // Load and display logo if available
-                if let logoUrl = appInfo.logoUrl ?? appInfo.iconUrl {
-                    let logoImage = await LocalImageLoader.shared.loadImage(from: logoUrl)
-                    if let logoImage = logoImage {
-                        logoImageView.image = logoImage
-                        logoImageView.isHidden = false
-                    }
-                }
-                
                 // Always start with profile selection - account creation happens during onboarding
 
                 let rootViewController = UINavigationController(rootViewController: ProfileSelectionViewController())
@@ -210,7 +144,7 @@ class AppStartViewController: UIViewController {
                 }
                 
                 messageLabel.text = "Failed to load app configuration.\n\(errorMessage)"
-                retryButton.backgroundColor = LocalBrandingManager.shared.primaryColor
+                retryButton.backgroundColor = BankConfiguration.current.primaryColor
                 retryButton.isHidden = false
             }
         }
@@ -222,36 +156,4 @@ class AppStartViewController: UIViewController {
 // MARK: - Notification Names
 extension Notification.Name {
     static let brandingLogoUpdated = Notification.Name("brandingLogoUpdated")
-}
-
-// MARK: - UIColor Extension for Hex Support
-extension UIColor {
-    convenience init?(hex: String) {
-        var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
-        hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
-        
-        var rgb: UInt64 = 0
-        
-        guard Scanner(string: hexSanitized).scanHexInt64(&rgb) else { return nil }
-        
-        let length = hexSanitized.count
-        
-        if length == 6 {
-            self.init(
-                red: CGFloat((rgb & 0xFF0000) >> 16) / 255.0,
-                green: CGFloat((rgb & 0x00FF00) >> 8) / 255.0,
-                blue: CGFloat(rgb & 0x0000FF) / 255.0,
-                alpha: 1.0
-            )
-        } else if length == 8 {
-            self.init(
-                red: CGFloat((rgb & 0xFF000000) >> 24) / 255.0,
-                green: CGFloat((rgb & 0x00FF0000) >> 16) / 255.0,
-                blue: CGFloat((rgb & 0x0000FF00) >> 8) / 255.0,
-                alpha: CGFloat(rgb & 0x000000FF) / 255.0
-            )
-        } else {
-            return nil
-        }
-    }
 }

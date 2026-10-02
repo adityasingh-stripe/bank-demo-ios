@@ -2176,10 +2176,10 @@ class MainViewController: UIViewController, PaymentCollectionDelegate {
     
     private func createResumeOnboardingBanner(message: String, accountId: String) -> UIView {
         let banner = UIView()
-        banner.backgroundColor = UIColor(red: 201/255, green: 43/255, blue: 35/255, alpha: 0.1)
+        banner.backgroundColor = BankConfiguration.current.primaryColor.withAlphaComponent(0.1)
         banner.layer.cornerRadius = 12
         banner.translatesAutoresizingMaskIntoConstraints = false
-        
+
         let titleLabel = UILabel()
         titleLabel.text = "Resume Account Setup"
         titleLabel.font = .systemFont(ofSize: 16, weight: .semibold)
@@ -2197,7 +2197,7 @@ class MainViewController: UIViewController, PaymentCollectionDelegate {
         resumeButton.setTitle("Resume Setup", for: .normal)
         resumeButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         resumeButton.setTitleColor(.white, for: .normal)
-        resumeButton.backgroundColor = UIColor(red: 201/255, green: 43/255, blue: 35/255, alpha: 1.0)
+        resumeButton.backgroundColor = BankConfiguration.current.primaryColor
         resumeButton.layer.cornerRadius = 8
         resumeButton.translatesAutoresizingMaskIntoConstraints = false
         resumeButton.addTarget(self, action: #selector(resumeOnboardingTapped), for: .touchUpInside)
@@ -2227,14 +2227,14 @@ class MainViewController: UIViewController, PaymentCollectionDelegate {
     
     private func createRequirementsNeededBanner(message: String, accountId: String) -> UIView {
         let banner = UIView()
-        banner.backgroundColor = UIColor.systemOrange.withAlphaComponent(0.1)
+        banner.backgroundColor = BankConfiguration.current.warningColor.withAlphaComponent(0.1)
         banner.layer.cornerRadius = 12
         banner.layer.borderWidth = 1
-        banner.layer.borderColor = UIColor.systemOrange.withAlphaComponent(0.3).cgColor
+        banner.layer.borderColor = BankConfiguration.current.warningColor.withAlphaComponent(0.3).cgColor
         banner.translatesAutoresizingMaskIntoConstraints = false
-        
+
         let iconImageView = UIImageView(image: UIImage(systemName: "exclamationmark.circle.fill"))
-        iconImageView.tintColor = .systemOrange
+        iconImageView.tintColor = BankConfiguration.current.warningColor
         iconImageView.translatesAutoresizingMaskIntoConstraints = false
         
         let titleLabel = UILabel()
@@ -2254,7 +2254,7 @@ class MainViewController: UIViewController, PaymentCollectionDelegate {
         provideInfoButton.setTitle("Provide Updated Information", for: .normal)
         provideInfoButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         provideInfoButton.setTitleColor(.white, for: .normal)
-        provideInfoButton.backgroundColor = .systemOrange
+        provideInfoButton.backgroundColor = BankConfiguration.current.warningColor
         provideInfoButton.layer.cornerRadius = 8
         provideInfoButton.translatesAutoresizingMaskIntoConstraints = false
         provideInfoButton.addTarget(self, action: #selector(provideRequiredInfoTapped), for: .touchUpInside)
@@ -3974,13 +3974,13 @@ extension MainViewController {
     private func getStatusColor(for status: String) -> UIColor {
         switch status.lowercased() {
         case "enabled":
-            return .systemGreen
+            return BankConfiguration.current.successColor
         case "pending":
-            return .systemOrange
+            return BankConfiguration.current.warningColor
         case "restricted", "restricted soon":
-            return .systemRed
+            return BankConfiguration.current.errorColor
         case "rejected":
-            return .systemRed
+            return BankConfiguration.current.errorColor
         default:
             return .systemGray
         }

@@ -247,7 +247,7 @@ extension BankConfiguration {
         primaryColor: UIColor(red: 201/255, green: 43/255, blue: 35/255, alpha: 1.0),
         primaryColorLight: UIColor(red: 201/255, green: 43/255, blue: 35/255, alpha: 0.1),
         primaryColorBorder: UIColor(red: 201/255, green: 43/255, blue: 35/255, alpha: 0.3),
-        logoImageName: "bank-logo-placeholder",
+        logoImageName: "SelectedBrandLogo",
         successColor: UIColor.systemGreen,
         errorColor: UIColor(red: 201/255, green: 43/255, blue: 35/255, alpha: 1.0),
         warningColor: UIColor.systemOrange,
@@ -291,7 +291,7 @@ extension BankConfiguration {
         primaryColor: UIColor(red: 0/255, green: 98/255, blue: 65/255, alpha: 1.0),
         primaryColorLight: UIColor(red: 0/255, green: 98/255, blue: 65/255, alpha: 0.1),
         primaryColorBorder: UIColor(red: 0/255, green: 98/255, blue: 65/255, alpha: 0.3),
-        logoImageName: "bank-logo-placeholder",
+        logoImageName: "SelectedBrandLogo",
         successColor: UIColor(red: 0/255, green: 98/255, blue: 65/255, alpha: 1.0),
         errorColor: UIColor.systemRed,
         warningColor: UIColor.systemOrange,
@@ -335,7 +335,7 @@ extension BankConfiguration {
         primaryColor: UIColor(red: 0/255, green: 174/255, blue: 239/255, alpha: 1.0),
         primaryColorLight: UIColor(red: 0/255, green: 174/255, blue: 239/255, alpha: 0.1),
         primaryColorBorder: UIColor(red: 0/255, green: 174/255, blue: 239/255, alpha: 0.3),
-        logoImageName: "bank-logo-placeholder",
+        logoImageName: "SelectedBrandLogo",
         successColor: UIColor.systemGreen,
         errorColor: UIColor.systemRed,
         warningColor: UIColor.systemOrange,
@@ -368,12 +368,50 @@ extension BankConfiguration {
         qrCodeTitle: "Scan to Complete Payment",
         qrCodeInstructions: "Use your phone's camera or payment app to scan this code and complete your payment securely"
     )
-}
 
-// MARK: - Current Configuration
-extension BankConfiguration {
-    // Change this line to switch between different banks
-    static let current = BankConfiguration.hsbc
+    static let bankOfIreland = BankConfiguration(
+        bankName: "Bank of Ireland",
+        bankDisplayName: "Bank of Ireland",
+        businessBankingName: "Bank of Ireland Business Banking",
+        domainName: "bankofireland.com",
+        errorDomain: "BankOfIrelandDemo",
+        paymentFallbackType: .checkoutSession,
+        primaryColor: UIColor(red: 0/255, green: 51/255, blue: 204/255, alpha: 1.0),
+        primaryColorLight: UIColor(red: 0/255, green: 51/255, blue: 204/255, alpha: 0.1),
+        primaryColorBorder: UIColor(red: 0/255, green: 51/255, blue: 204/255, alpha: 0.3),
+        logoImageName: "SelectedBrandLogo",
+        successColor: UIColor.systemGreen,
+        errorColor: UIColor.systemRed,
+        warningColor: UIColor.systemOrange,
+        amountColor: UIColor(red: 0/255, green: 51/255, blue: 204/255, alpha: 1.0),
+        buttonCornerRadius: 8,
+        cardCornerRadius: 12,
+        titleFontSize: 28,
+        headlineFontSize: 24,
+        bodyFontSize: 17,
+        captionFontSize: 14,
+        amountFontSize: 36,
+        defaultSpacing: 16,
+        largeSpacing: 32,
+        smallSpacing: 8,
+        buttonHeight: 52,
+        currentAccountName: "Business Current Account",
+        businessSavingsName: "Business Savings",
+        businessCreditCardName: "Business Credit Card",
+        supportPhoneNumber: "+353 1 250 2000",
+        supportEmail: "support@example.com",
+        navigationTitle: "Bank of Ireland Business",
+        onboardingSubtitle: "Set up your Bank of Ireland business account to start accepting payments",
+        getStartedButtonTitle: "Get Started",
+        laterButtonTitle: "Later",
+        accountCreatedMessage: "Your Bank of Ireland business account has been successfully created!",
+        supportMessage: "For support, call +353 1 250 2000 or email support@example.com",
+        paymentFailedTitle: "Payment Failed",
+        paymentSuccessTitle: "Payment Successful",
+        paymentSessionTitle: "Payment Session Ready",
+        qrCodeTitle: "Scan to Complete Payment",
+        qrCodeInstructions: "Use your phone's camera or payment app to scan this code and complete your payment securely"
+    )
 }
 
 // MARK: - Convenience Extensions
@@ -419,4 +457,4 @@ extension UIColor {
     static var bankAmount: UIColor {
         return BankConfiguration.current.amountColor
     }
-} 
+}

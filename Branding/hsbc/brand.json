@@ -1,0 +1,13 @@
+{
+  "id": "hsbc",
+  "swiftConfiguration": "hsbc",
+  "primaryColor": "#C92B23",
+  "appIcon": {
+    "backgroundColor": "#FFFFFF",
+    "logoTreatment": "original"
+  },
+  "launch": {
+    "backgroundColor": "#192E4B",
+    "logoTreatment": "original"
+  }
+}

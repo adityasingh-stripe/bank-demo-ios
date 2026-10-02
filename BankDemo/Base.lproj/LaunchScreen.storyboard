@@ -17,16 +17,16 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="bank-logo-placeholder" translatesAutoresizingMaskIntoConstraints="NO" id="tpl-NI-fTA">
-                                <rect key="frame" x="146.66666666666666" y="376" width="100" height="100"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="SelectedLaunchLogo" translatesAutoresizingMaskIntoConstraints="NO" id="tpl-NI-fTA">
+                                <rect key="frame" x="96.5" y="326" width="200" height="200"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="100" id="3gH-Yt-8mL"/>
-                                    <constraint firstAttribute="height" constant="100" id="9oR-Lh-fYd"/>
+                                    <constraint firstAttribute="width" constant="200" id="3gH-Yt-8mL"/>
+                                    <constraint firstAttribute="height" constant="200" id="9oR-Lh-fYd"/>
                                 </constraints>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
-                        <color key="backgroundColor" red="0.098039215686274508" green="0.18039215686274512" blue="0.29411764705882354" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="backgroundColor" name="SelectedLaunchBackground"/>
                         <constraints>
                             <constraint firstItem="tpl-NI-fTA" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="C34-2d-4Rw"/>
                             <constraint firstItem="tpl-NI-fTA" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="fIw-p1-lqC"/>
@@ -39,6 +39,9 @@
         </scene>
     </scenes>
     <resources>
-        <image name="bank-logo-placeholder" width="1024" height="1024"/>
+        <image name="SelectedLaunchLogo" width="1024" height="1024"/>
+        <namedColor name="SelectedLaunchBackground">
+            <color red="0.0" green="0.2" blue="0.8" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
     </resources>
 </document>

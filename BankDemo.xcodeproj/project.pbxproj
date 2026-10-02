@@ -39,6 +39,7 @@
 		41810D762C8A005D00F10EB7 /* AppearanceInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41810D752C8A005D00F10EB7 /* AppearanceInfo.swift */; };
 		41810D782C8A006F00F10EB7 /* AppSettings+AppearanceInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41810D772C8A006F00F10EB7 /* AppSettings+AppearanceInfo.swift */; };
 		47C8B71904CB4EFFAE72C1DE /* BankConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9FC5F1DAFA5479F8C11D225 /* BankConfiguration.swift */; };
+		B10000000000000000000002 /* SelectedBankConfiguration.generated.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000001 /* SelectedBankConfiguration.generated.swift */; };
 
 		41E126E32D80B97000623208 /* XCUIApplication+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E126E22D80B96900623208 /* XCUIApplication+Extension.swift */; };
 		41E9A1BD2C7CC85100EDE131 /* SwiftUIContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41E9A1BC2C7CC85100EDE131 /* SwiftUIContainerViewController.swift */; };
@@ -117,6 +118,7 @@
 		41810D752C8A005D00F10EB7 /* AppearanceInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppearanceInfo.swift; sourceTree = "<group>"; };
 		41810D772C8A006F00F10EB7 /* AppSettings+AppearanceInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppSettings+AppearanceInfo.swift"; sourceTree = "<group>"; };
 		D9FC5F1DAFA5479F8C11D225 /* BankConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Configuration/BankConfiguration.swift"; sourceTree = "<group>"; };
+		B10000000000000000000001 /* SelectedBankConfiguration.generated.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Configuration/SelectedBankConfiguration.generated.swift"; sourceTree = "<group>"; };
 
 		41E126E22D80B96900623208 /* XCUIApplication+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XCUIApplication+Extension.swift"; sourceTree = "<group>"; };
 		41E9A1BC2C7CC85100EDE131 /* SwiftUIContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIContainerViewController.swift; sourceTree = "<group>"; };
@@ -246,6 +248,7 @@
 				TM001T5C1234567890123456 /* TerminalManager.swift */,
 				EN001T6C1234567890123456 /* BankDemo.entitlements */,
 				D9FC5F1DAFA5479F8C11D225 /* BankConfiguration.swift */,
+				B10000000000000000000001 /* SelectedBankConfiguration.generated.swift */,
 			);
 			path = BankDemo;
 			sourceTree = "<group>";
@@ -492,6 +495,7 @@
 				416E9EE12C78C10900A0B917 /* BankTabBarController.swift in Sources */,
 				TM001T4C1234567890123456 /* TerminalManager.swift in Sources */,
 				47C8B71904CB4EFFAE72C1DE /* BankConfiguration.swift in Sources */,
+				B10000000000000000000002 /* SelectedBankConfiguration.generated.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

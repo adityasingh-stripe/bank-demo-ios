@@ -151,9 +151,9 @@ class PaymentsViewController: UIViewController {
     
     private func setupBankBranding() {
         // Apply bank branding
-        navigationController?.navigationBar.tintColor = UIColor(red: 201/255, green: 43/255, blue: 35/255, alpha: 1)
+        navigationController?.navigationBar.tintColor = BankConfiguration.current.primaryColor
         navigationController?.navigationBar.titleTextAttributes = [
-            .foregroundColor: UIColor(red: 201/255, green: 43/255, blue: 35/255, alpha: 1)
+            .foregroundColor: BankConfiguration.current.primaryColor
         ]
     }
     
@@ -195,7 +195,7 @@ class PaymentsViewController: UIViewController {
         
         let setupButton = UIButton(type: .system)
         setupButton.setTitle("Go to Home", for: .normal)
-        setupButton.backgroundColor = UIColor(red: 201/255, green: 43/255, blue: 35/255, alpha: 1)
+        setupButton.backgroundColor = BankConfiguration.current.primaryColor
         setupButton.setTitleColor(.white, for: .normal)
         setupButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         setupButton.layer.cornerRadius = 8
@@ -320,9 +320,9 @@ class PayoutsViewController: UIViewController {
     
     private func setupBankBranding() {
         // Apply bank branding
-        navigationController?.navigationBar.tintColor = UIColor(red: 201/255, green: 43/255, blue: 35/255, alpha: 1)
+        navigationController?.navigationBar.tintColor = BankConfiguration.current.primaryColor
         navigationController?.navigationBar.titleTextAttributes = [
-            .foregroundColor: UIColor(red: 201/255, green: 43/255, blue: 35/255, alpha: 1)
+            .foregroundColor: BankConfiguration.current.primaryColor
         ]
     }
     
@@ -364,7 +364,7 @@ class PayoutsViewController: UIViewController {
         
         let setupButton = UIButton(type: .system)
         setupButton.setTitle("Go to Home", for: .normal)
-        setupButton.backgroundColor = UIColor(red: 201/255, green: 43/255, blue: 35/255, alpha: 1)
+        setupButton.backgroundColor = BankConfiguration.current.primaryColor
         setupButton.setTitleColor(.white, for: .normal)
         setupButton.titleLabel?.font = UIFont.systemFont(ofSize: 16, weight: .medium)
         setupButton.layer.cornerRadius = 8
