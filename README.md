@@ -99,6 +99,7 @@ icon and launch asset bundles, so they are not accepted by the selector.
        businessBankingName: "Your Bank Business",
        domainName: "yourbank.com",
        errorDomain: "YourBankDemo",
+       market: .unitedKingdom, // or .ireland for IE accounts and EUR
        primaryColor: UIColor(red: 255/255, green: 0/255, blue: 0/255, alpha: 1.0),
        primaryColorLight: UIColor(red: 255/255, green: 0/255, blue: 0/255, alpha: 0.1),
        primaryColorBorder: UIColor(red: 255/255, green: 0/255, blue: 0/255, alpha: 0.3),
@@ -126,6 +127,7 @@ icon and launch asset bundles, so they are not accepted by the selector.
 
 The theme system includes:
 
+- **Market**: Stripe account country, currency, locale, and local bank-detail labels
 - **Colors**: Primary, success, error, warning colors
 - **Typography**: Font sizes for titles, headlines, body text, captions
 - **Spacing**: Default, large, and small spacing values

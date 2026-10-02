@@ -279,7 +279,8 @@ class CheckoutSessionViewController: UIViewController {
     }
     
     private func createCheckoutSession() {
-        print("🛒 Creating checkout session for amount: £\(String(format: "%.2f", amount))")
+        let market = BankConfiguration.current.activeMarket
+        print("🛒 Creating checkout session for amount: \(market.format(amount))")
         
         let backendBaseURL = AppSettings.shared.selectedServerBaseURL
         guard let url = URL(string: "\(backendBaseURL)/api/create_checkout_session") else {
@@ -300,7 +301,7 @@ class CheckoutSessionViewController: UIViewController {
         
         let requestBody: [String: Any] = [
             "amount": Int(amount * 100), // Convert to cents
-            "currency": "gbp",
+            "currency": market.currencyCode.lowercased(),
             "account_id": currentAccountId,
             "customer": customer.map { ["id": $0.id, "name": $0.name] } ?? NSNull(),
             "description": paymentDescription
@@ -456,4 +457,4 @@ class CheckoutSessionViewController: UIViewController {
         print("❌ Cancel checkout session")
         dismiss(animated: true)
     }
-} 
+}

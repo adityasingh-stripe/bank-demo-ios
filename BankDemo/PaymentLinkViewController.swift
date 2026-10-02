@@ -279,7 +279,8 @@ class PaymentLinkViewController: UIViewController {
     }
     
     private func createPaymentLink() {
-        print("🔗 Creating payment link for amount: £\(String(format: "%.2f", amount))")
+        let market = BankConfiguration.current.activeMarket
+        print("🔗 Creating payment link for amount: \(market.format(amount))")
         
         let backendBaseURL = AppSettings.shared.selectedServerBaseURL
         guard let url = URL(string: "\(backendBaseURL)/api/create_payment_link") else {
@@ -300,7 +301,7 @@ class PaymentLinkViewController: UIViewController {
         
         let requestBody: [String: Any] = [
             "amount": Int(amount * 100), // Convert to cents
-            "currency": "gbp",
+            "currency": market.currencyCode.lowercased(),
             "account_id": currentAccountId,
             "customer": customer.map { ["id": $0.id, "name": $0.name] } ?? NSNull(),
             "description": paymentDescription
@@ -465,4 +466,4 @@ class PaymentLinkViewController: UIViewController {
         print("❌ Cancel payment link")
         dismiss(animated: true)
     }
-} 
+}

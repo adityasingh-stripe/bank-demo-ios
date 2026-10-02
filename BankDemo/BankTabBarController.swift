@@ -442,6 +442,8 @@ final class AppDataManager: ObservableObject {
     
     private let userDefaults = UserDefaults.standard
     private let accountIdKey = "ConnectedAccountId"
+    private let accountCountryKey = "ConnectedAccountCountry"
+    private let accountCurrencyKey = "ConnectedAccountCurrency"
     
     @Published private var _currentAccountId: String?
     
@@ -459,10 +461,29 @@ final class AppDataManager: ObservableObject {
                 print("INFO: Saved account ID to UserDefaults: \(newValue)")
             } else {
                 userDefaults.removeObject(forKey: accountIdKey)
+                clearAccountContext()
                 print("INFO: Cleared account ID from UserDefaults")
             }
             userDefaults.synchronize()
         }
+    }
+
+    var currentAccountCountry: String? {
+        userDefaults.string(forKey: accountCountryKey)
+    }
+
+    var currentAccountCurrency: String? {
+        userDefaults.string(forKey: accountCurrencyKey)
+    }
+
+    func setAccountContext(country: String, currency: String) {
+        userDefaults.set(country.uppercased(), forKey: accountCountryKey)
+        userDefaults.set(currency.uppercased(), forKey: accountCurrencyKey)
+    }
+
+    func clearAccountContext() {
+        userDefaults.removeObject(forKey: accountCountryKey)
+        userDefaults.removeObject(forKey: accountCurrencyKey)
     }
     
     /// Safely retrieve the current account ID from any context
@@ -477,6 +498,8 @@ final class AppDataManager: ObservableObject {
             print("INFO: Saved account ID to UserDefaults: \(newValue)")
         } else {
             UserDefaults.standard.removeObject(forKey: accountIdKey)
+            UserDefaults.standard.removeObject(forKey: "ConnectedAccountCountry")
+            UserDefaults.standard.removeObject(forKey: "ConnectedAccountCurrency")
             print("INFO: Cleared account ID from UserDefaults")
         }
         UserDefaults.standard.synchronize()
@@ -539,7 +562,7 @@ class SupportViewController: UIViewController {
 // MARK: - BankingDashboardViewController
 class BankingDashboardViewController: UIViewController {
     
-    private var accountBalance: String = "£0.00"
+    private var accountBalance: String = BankConfiguration.current.activeMarket.format(0)
     private var accountStatus: String = "Loading..."
     private var accountId: String? {
         return AppDataManager.shared.currentAccountId

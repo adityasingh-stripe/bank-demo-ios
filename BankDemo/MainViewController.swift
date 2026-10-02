@@ -31,12 +31,12 @@ class MainViewController: UIViewController, PaymentCollectionDelegate {
     private var hasGeneratedTestData = false
     
     // Business Account Data - Single account as requested
-    private let businessAccount = BusinessAccount(
+    private lazy var businessAccount = BusinessAccount(
         name: "Business Account",
         balance: 25117.27,
         available: 3517.27,
-        sortCode: "77-61-27",
-        accountNumber: "004923476"
+        sortCode: BankConfiguration.current.activeMarket.secondaryBankDetailValue,
+        accountNumber: BankConfiguration.current.activeMarket.primaryBankDetailValue
     )
     
     // Current account session
@@ -629,10 +629,10 @@ class MainViewController: UIViewController, PaymentCollectionDelegate {
     private func showAccountDetails() {
         let message = """
         Account Name: \(businessAccount.name)
-        Sort Code: \(businessAccount.sortCode)
-        Account Number: \(businessAccount.accountNumber)
-        Available Balance: £\(String(format: "%.2f", businessAccount.available))
-        Current Balance: £\(String(format: "%.2f", businessAccount.balance))
+        \(BankConfiguration.current.activeMarket.secondaryBankDetailLabel): \(businessAccount.sortCode)
+        \(BankConfiguration.current.activeMarket.primaryBankDetailLabel): \(businessAccount.accountNumber)
+        Available Balance: \(BankConfiguration.current.activeMarket.format(businessAccount.available))
+        Current Balance: \(BankConfiguration.current.activeMarket.format(businessAccount.balance))
         """
         
         let alert = UIAlertController(title: "Account Details", message: message, preferredStyle: .alert)
@@ -1016,6 +1016,11 @@ class MainViewController: UIViewController, PaymentCollectionDelegate {
                     
                     switch result {
                     case .success(let accountId):
+                        let market = BankConfiguration.current.market
+                        AppDataManager.shared.setAccountContext(
+                            country: market.countryCode,
+                            currency: market.currencyCode
+                        )
                         self?.presentOnboardingFlow(accountId: accountId)
                     case .failure(let error):
                         self?.showError("Failed to create account: \(error.localizedDescription)")
@@ -1363,18 +1368,18 @@ class MainViewController: UIViewController, PaymentCollectionDelegate {
         accountNameLabel.textColor = UIColor(red: 201/255, green: 43/255, blue: 35/255, alpha: 1)
         
         let sortCodeLabel = UILabel()
-        sortCodeLabel.text = "Sort Code: \(account.sortCode)"
+        sortCodeLabel.text = "\(BankConfiguration.current.activeMarket.secondaryBankDetailLabel): \(account.sortCode)"
         sortCodeLabel.font = UIFont.systemFont(ofSize: 12)
         sortCodeLabel.textColor = .gray
         
         let accountNumberLabel = UILabel()
-        accountNumberLabel.text = "Account: \(account.accountNumber)"
+        accountNumberLabel.text = "\(BankConfiguration.current.activeMarket.primaryBankDetailLabel): \(account.accountNumber)"
         accountNumberLabel.font = UIFont.systemFont(ofSize: 12)
         accountNumberLabel.textColor = .gray
         
         // Balance (right side, top)
         let balanceLabel = UILabel()
-        balanceLabel.text = String(format: "£%.2f", account.balance)
+        balanceLabel.text = BankConfiguration.current.activeMarket.format(account.balance)
         balanceLabel.font = UIFont.boldSystemFont(ofSize: 18)
         balanceLabel.textColor = .black
         balanceLabel.textAlignment = .right
@@ -1481,11 +1486,7 @@ class MainViewController: UIViewController, PaymentCollectionDelegate {
     }
     
     private func formatCurrency(_ amount: Double) -> String {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.currencyCode = "GBP"
-        formatter.locale = Locale(identifier: "en_GB")
-        return formatter.string(from: NSNumber(value: amount)) ?? "£0.00"
+        BankConfiguration.current.activeMarket.format(amount)
     }
     
     // MARK: - Actions
@@ -1577,7 +1578,7 @@ class MainViewController: UIViewController, PaymentCollectionDelegate {
         let alert = UIAlertController(title: "Create Payment Link", message: "Enter payment details", preferredStyle: .alert)
         
         alert.addTextField { textField in
-            textField.placeholder = "Amount (£)"
+            textField.placeholder = "Amount (\(BankConfiguration.current.activeMarket.currencySymbol))"
             textField.keyboardType = .decimalPad
         }
         
@@ -1684,7 +1685,7 @@ class MainViewController: UIViewController, PaymentCollectionDelegate {
         let alert = UIAlertController(title: "Process Card Payment", message: "Enter payment details", preferredStyle: .alert)
         
         alert.addTextField { textField in
-            textField.placeholder = "Amount (£)"
+            textField.placeholder = "Amount (\(BankConfiguration.current.activeMarket.currencySymbol))"
             textField.keyboardType = .decimalPad
         }
         
@@ -1912,6 +1913,11 @@ class MainViewController: UIViewController, PaymentCollectionDelegate {
                 alert.dismiss(animated: true) {
                     switch result {
                     case .success(let accountId):
+                        let market = BankConfiguration.current.market
+                        AppDataManager.shared.setAccountContext(
+                            country: market.countryCode,
+                            currency: market.currencyCode
+                        )
                         self?.presentOnboardingFlow(accountId: accountId)
                     case .failure(let error):
                         self?.showError("Failed to create account: \(error.localizedDescription)")
@@ -1941,7 +1947,8 @@ class MainViewController: UIViewController, PaymentCollectionDelegate {
         let requestBody: [String: Any] = [
             "profile_type": profile.type,
             "profile_data": profile.profileData,
-            "business_profile": [:] // Will be filled by backend based on profile data
+            "business_profile": [:], // Will be filled by backend based on profile data
+            "market": BankConfiguration.current.market.code
         ]
         
         do {
@@ -2755,7 +2762,10 @@ class MainViewController: UIViewController, PaymentCollectionDelegate {
         // Extract the account_status object from the response
         if let success = json?["success"] as? Bool, success,
            let accountStatus = json?["account_status"] as? [String: Any] {
-    
+            if let country = accountStatus["country"] as? String,
+               let currency = accountStatus["currency"] as? String {
+                AppDataManager.shared.setAccountContext(country: country, currency: currency)
+            }
             return accountStatus
         } else {
             print("ERROR: Backend response does not contain expected account_status format")
@@ -3088,7 +3098,7 @@ extension MainViewController {
         
         // Balance (bottom left)
         let balanceLabel = UILabel()
-        balanceLabel.text = "£\(String(format: "%.2f", businessAccount.balance))"
+        balanceLabel.text = formatCurrency(businessAccount.balance)
         balanceLabel.font = .systemFont(ofSize: 28, weight: .bold)
         balanceLabel.textColor = .white
         balanceLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -3252,7 +3262,7 @@ extension MainViewController {
     }
     
     private func presentSendModal() {
-        let alert = UIAlertController(title: "Send Money", message: "Available balance: £\(String(format: "%.2f", businessAccount.balance))", preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: "Send Money", message: "Available balance: \(formatCurrency(businessAccount.balance))", preferredStyle: .actionSheet)
         
         alert.addAction(UIAlertAction(title: "Make a payment", style: .default) { _ in
             print("Make a payment selected")
@@ -3280,7 +3290,7 @@ extension MainViewController {
     }
     
     private func presentGetPaidModal() {
-        let alert = UIAlertController(title: "Get Paid", message: "\(BankConfiguration.current.currentAccountName): £\(String(format: "%.2f", businessAccount.balance))", preferredStyle: .actionSheet)
+        let alert = UIAlertController(title: "Get Paid", message: "\(BankConfiguration.current.currentAccountName): \(formatCurrency(businessAccount.balance))", preferredStyle: .actionSheet)
         
         alert.addAction(UIAlertAction(title: "Add money", style: .default) { _ in
             print("Add money selected")
@@ -3356,7 +3366,7 @@ extension MainViewController {
         inputContainer.layer.cornerRadius = 8
         
         let currencyLabel = UILabel()
-        currencyLabel.text = "£"
+        currencyLabel.text = BankConfiguration.current.activeMarket.currencySymbol
         currencyLabel.font = .systemFont(ofSize: 16, weight: .medium)
         currencyLabel.textColor = .label
         currencyLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -3487,17 +3497,17 @@ extension MainViewController {
         // Additional validation for reasonable payment amounts
         if amount < 0.01 {
             print("Amount too small: \(amount)")
-            showAlert(title: "Invalid Amount", message: "Amount must be at least £0.01.", completion: nil)
+            showAlert(title: "Invalid Amount", message: "Amount must be at least \(formatCurrency(0.01)).", completion: nil)
             return
         }
         
         if amount > 10000.00 {
             print("Amount too large: \(amount)")
-            showAlert(title: "Invalid Amount", message: "Amount must be less than £10,000.00.", completion: nil)
+            showAlert(title: "Invalid Amount", message: "Amount must be less than \(formatCurrency(10_000)).", completion: nil)
             return
         }
         
-        print("💳 UI: Opening payment collection for \(amount) GBP (amount in cents: \(Int(amount * 100)))")
+        print("💳 UI: Opening payment collection for \(amount) \(BankConfiguration.current.activeMarket.currencyCode) (amount in cents: \(Int(amount * 100)))")
         
         // Create and present payment collection screen
         let paymentVC = PaymentCollectionViewController(amount: amount, terminalManager: terminalManager)
@@ -3512,7 +3522,7 @@ extension MainViewController {
     /// Validates and parses amount string to Double with proper error handling
     private func validateAndParseAmount(_ amountText: String) -> Double? {
         // Remove any currency symbols and whitespace
-        let cleanedText = amountText.replacingOccurrences(of: "£", with: "")
+        let cleanedText = amountText.replacingOccurrences(of: BankConfiguration.current.activeMarket.currencySymbol, with: "")
                                    .replacingOccurrences(of: "$", with: "")
                                    .replacingOccurrences(of: "€", with: "")
                                    .trimmingCharacters(in: .whitespacesAndNewlines)
@@ -3557,7 +3567,7 @@ extension MainViewController {
         // Update button to show payment processing
         button.setTitle("Processing...", for: .normal)
         
-        terminalManager.collectPayment(amount: amount, currency: "gbp", customer: nil) { [weak self] (result: Result<PaymentIntent, Error>) in
+        terminalManager.collectPayment(amount: amount, currency: BankConfiguration.current.activeMarket.currencyCode.lowercased(), customer: nil) { [weak self] (result: Result<PaymentIntent, Error>) in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let paymentIntent):
@@ -3587,7 +3597,7 @@ extension MainViewController {
         
         showAlert(
             title: "Payment Successful! 🎉",
-            message: "Payment of £\(formattedAmount) completed successfully.",
+            message: "Payment of \(BankConfiguration.current.activeMarket.currencySymbol)\(formattedAmount) completed successfully.",
             completion: { [weak self] in
                 self?.resetPaymentButton(button, textField: textField)
                 // Clear the amount field
@@ -3699,9 +3709,9 @@ extension MainViewController {
         
         // Sample transactions (limit to 3)
         let transactions = [
-            ("\(BankConfiguration.current.bankDisplayName) Payout", "Settlement", "+£42.50", "today", BankConfiguration.current.bankName.lowercased()),
-            ("STARBUCKS", "Card payment", "-£4.75", "yesterday", "starbucks"),
-            ("AMAZON", "Online purchase", "-£29.99", "2 days ago", "amazon")
+            ("\(BankConfiguration.current.bankDisplayName) Payout", "Settlement", "+\(formatCurrency(42.50))", "today", BankConfiguration.current.bankName.lowercased()),
+            ("STARBUCKS", "Card payment", "-\(formatCurrency(4.75))", "yesterday", "starbucks"),
+            ("AMAZON", "Online purchase", "-\(formatCurrency(29.99))", "2 days ago", "amazon")
         ]
         
         for (index, transaction) in transactions.enumerated() {
@@ -4026,7 +4036,7 @@ class AllAccountsViewController: UIViewController {
         // Current account
         let currentAccount = createAccountCard(
             name: BankConfiguration.current.currentAccountName,
-            balance: "£25,117.27",
+            balance: BankConfiguration.current.activeMarket.format(25_117.27),
             accountNumber: "****6789",
             isPrimary: true
         )
@@ -4035,7 +4045,7 @@ class AllAccountsViewController: UIViewController {
         // Savings account
         let savingsAccount = createAccountCard(
             name: BankConfiguration.current.businessSavingsName,
-            balance: "£8,450.00",
+            balance: BankConfiguration.current.activeMarket.format(8_450),
             accountNumber: "****2341",
             isPrimary: false
         )
@@ -4044,7 +4054,7 @@ class AllAccountsViewController: UIViewController {
         // Credit account
         let creditAccount = createAccountCard(
             name: BankConfiguration.current.businessCreditCardName,
-            balance: "£2,150.00 available",
+            balance: "\(BankConfiguration.current.activeMarket.format(2_150)) available",
             accountNumber: "****9876",
             isPrimary: false
         )
@@ -4158,24 +4168,24 @@ class EnhancedTransactionsViewController: UIViewController {
     
     // Sample transaction data with proper dates
     private let allTransactions: [(title: String, subtitle: String, amount: String, date: Date, type: String)] = [
-        ("\(BankConfiguration.current.bankDisplayName) Payout", "Settlement", "+£127.35", Calendar.current.date(byAdding: .day, value: 0, to: Date())!, BankConfiguration.current.bankName.lowercased()),
-        ("STARBUCKS", "Card payment", "-£4.75", Calendar.current.date(byAdding: .day, value: 0, to: Date())!, "starbucks"),
-        ("TESCO", "Contactless payment", "-£23.40", Calendar.current.date(byAdding: .day, value: 0, to: Date())!, "tesco"),
-        ("\(BankConfiguration.current.bankDisplayName) Payout", "Settlement", "+£89.20", Calendar.current.date(byAdding: .day, value: -1, to: Date())!, BankConfiguration.current.bankName.lowercased()),
-        ("AMAZON", "Online purchase", "-£29.99", Calendar.current.date(byAdding: .day, value: -1, to: Date())!, "amazon"),
-        ("UBER", "Transportation", "-£12.50", Calendar.current.date(byAdding: .day, value: -1, to: Date())!, "uber"),
-        ("DELIVEROO", "Food delivery", "-£18.75", Calendar.current.date(byAdding: .day, value: -2, to: Date())!, "deliveroo"),
-        ("\(BankConfiguration.current.bankDisplayName) Payout", "Settlement", "+£203.60", Calendar.current.date(byAdding: .day, value: -2, to: Date())!, BankConfiguration.current.bankName.lowercased()),
-        ("SAINSBURYS", "Grocery shopping", "-£45.80", Calendar.current.date(byAdding: .day, value: -2, to: Date())!, "sainsburys"),
-        ("SPOTIFY", "Monthly subscription", "-£9.99", Calendar.current.date(byAdding: .day, value: -3, to: Date())!, "spotify"),
-        ("SHELL", "Fuel payment", "-£52.30", Calendar.current.date(byAdding: .day, value: -3, to: Date())!, "fuel"),
-        ("\(BankConfiguration.current.bankDisplayName) Payout", "Settlement", "+£76.45", Calendar.current.date(byAdding: .day, value: -3, to: Date())!, BankConfiguration.current.bankName.lowercased()),
-        ("MCDONALD'S", "Fast food", "-£8.60", Calendar.current.date(byAdding: .day, value: -4, to: Date())!, "mcdonalds"),
-        ("NETFLIX", "Monthly subscription", "-£12.99", Calendar.current.date(byAdding: .day, value: -4, to: Date())!, "netflix"),
-        ("JOHN LEWIS", "Shopping", "-£78.50", Calendar.current.date(byAdding: .day, value: -5, to: Date())!, "shopping"),
-        ("\(BankConfiguration.current.bankDisplayName) Payout", "Settlement", "+£156.78", Calendar.current.date(byAdding: .day, value: -5, to: Date())!, BankConfiguration.current.bankName.lowercased()),
-        ("COSTA COFFEE", "Coffee", "-£3.20", Calendar.current.date(byAdding: .day, value: -6, to: Date())!, "coffee"),
-        ("PAYPAL", "Online payment", "-£42.00", Calendar.current.date(byAdding: .day, value: -7, to: Date())!, "paypal")
+        ("\(BankConfiguration.current.bankDisplayName) Payout", "Settlement", "+\(BankConfiguration.current.activeMarket.format(127.35))", Calendar.current.date(byAdding: .day, value: 0, to: Date())!, BankConfiguration.current.bankName.lowercased()),
+        ("STARBUCKS", "Card payment", "-\(BankConfiguration.current.activeMarket.format(4.75))", Calendar.current.date(byAdding: .day, value: 0, to: Date())!, "starbucks"),
+        ("TESCO", "Contactless payment", "-\(BankConfiguration.current.activeMarket.format(23.40))", Calendar.current.date(byAdding: .day, value: 0, to: Date())!, "tesco"),
+        ("\(BankConfiguration.current.bankDisplayName) Payout", "Settlement", "+\(BankConfiguration.current.activeMarket.format(89.20))", Calendar.current.date(byAdding: .day, value: -1, to: Date())!, BankConfiguration.current.bankName.lowercased()),
+        ("AMAZON", "Online purchase", "-\(BankConfiguration.current.activeMarket.format(29.99))", Calendar.current.date(byAdding: .day, value: -1, to: Date())!, "amazon"),
+        ("UBER", "Transportation", "-\(BankConfiguration.current.activeMarket.format(12.50))", Calendar.current.date(byAdding: .day, value: -1, to: Date())!, "uber"),
+        ("DELIVEROO", "Food delivery", "-\(BankConfiguration.current.activeMarket.format(18.75))", Calendar.current.date(byAdding: .day, value: -2, to: Date())!, "deliveroo"),
+        ("\(BankConfiguration.current.bankDisplayName) Payout", "Settlement", "+\(BankConfiguration.current.activeMarket.format(203.60))", Calendar.current.date(byAdding: .day, value: -2, to: Date())!, BankConfiguration.current.bankName.lowercased()),
+        ("SAINSBURYS", "Grocery shopping", "-\(BankConfiguration.current.activeMarket.format(45.80))", Calendar.current.date(byAdding: .day, value: -2, to: Date())!, "sainsburys"),
+        ("SPOTIFY", "Monthly subscription", "-\(BankConfiguration.current.activeMarket.format(9.99))", Calendar.current.date(byAdding: .day, value: -3, to: Date())!, "spotify"),
+        ("SHELL", "Fuel payment", "-\(BankConfiguration.current.activeMarket.format(52.30))", Calendar.current.date(byAdding: .day, value: -3, to: Date())!, "fuel"),
+        ("\(BankConfiguration.current.bankDisplayName) Payout", "Settlement", "+\(BankConfiguration.current.activeMarket.format(76.45))", Calendar.current.date(byAdding: .day, value: -3, to: Date())!, BankConfiguration.current.bankName.lowercased()),
+        ("MCDONALD'S", "Fast food", "-\(BankConfiguration.current.activeMarket.format(8.60))", Calendar.current.date(byAdding: .day, value: -4, to: Date())!, "mcdonalds"),
+        ("NETFLIX", "Monthly subscription", "-\(BankConfiguration.current.activeMarket.format(12.99))", Calendar.current.date(byAdding: .day, value: -4, to: Date())!, "netflix"),
+        ("JOHN LEWIS", "Shopping", "-\(BankConfiguration.current.activeMarket.format(78.50))", Calendar.current.date(byAdding: .day, value: -5, to: Date())!, "shopping"),
+        ("\(BankConfiguration.current.bankDisplayName) Payout", "Settlement", "+\(BankConfiguration.current.activeMarket.format(156.78))", Calendar.current.date(byAdding: .day, value: -5, to: Date())!, BankConfiguration.current.bankName.lowercased()),
+        ("COSTA COFFEE", "Coffee", "-\(BankConfiguration.current.activeMarket.format(3.20))", Calendar.current.date(byAdding: .day, value: -6, to: Date())!, "coffee"),
+        ("PAYPAL", "Online payment", "-\(BankConfiguration.current.activeMarket.format(42.00))", Calendar.current.date(byAdding: .day, value: -7, to: Date())!, "paypal")
     ]
     
     override func viewDidLoad() {
@@ -4281,7 +4291,7 @@ class EnhancedTransactionsViewController: UIViewController {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
         let balanceLabel = UILabel()
-        balanceLabel.text = "£25,117.27"
+        balanceLabel.text = BankConfiguration.current.activeMarket.format(25_117.27)
         balanceLabel.font = .systemFont(ofSize: 24, weight: .bold)
         balanceLabel.textColor = .label
         balanceLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -4682,12 +4692,12 @@ class EnhancedTransactionsViewController: UIViewController {
 // MARK: - AccountDetailsViewController
 class AccountDetailsViewController: UIViewController {
     
-    private let businessAccount = BusinessAccount(
+    private lazy var businessAccount = BusinessAccount(
         name: "Business Account",
         balance: 25117.27,
         available: 3517.27,
-        sortCode: "77-61-27",
-        accountNumber: "004923476"
+        sortCode: BankConfiguration.current.activeMarket.secondaryBankDetailValue,
+        accountNumber: BankConfiguration.current.activeMarket.primaryBankDetailValue
     )
     
     override func viewDidLoad() {
@@ -4727,7 +4737,7 @@ class AccountDetailsViewController: UIViewController {
         
         // Balance info
         let balanceLabel = UILabel()
-        balanceLabel.text = "£\(String(format: "%.2f", businessAccount.available)) available"
+        balanceLabel.text = "\(BankConfiguration.current.activeMarket.format(businessAccount.available)) available"
         balanceLabel.font = .systemFont(ofSize: 16)
         balanceLabel.textColor = .secondaryLabel
         balanceLabel.textAlignment = .center
@@ -4828,7 +4838,7 @@ class AccountDetailsViewController: UIViewController {
         tabContainer.layer.cornerRadius = 8
         tabContainer.translatesAutoresizingMaskIntoConstraints = false
         
-        let ukTab = createTabButton(title: "UK", isSelected: true)
+        let ukTab = createTabButton(title: BankConfiguration.current.activeMarket.countryCode, isSelected: true)
         let swiftTab = createTabButton(title: "SWIFT", isSelected: false)
         let sepaTab = createTabButton(title: "SEPA", isSelected: false)
         
@@ -4841,7 +4851,7 @@ class AccountDetailsViewController: UIViewController {
         
         // Description
         let descLabel = UILabel()
-        descLabel.text = "These details are for receiving GBP payments from other UK accounts"
+        descLabel.text = BankConfiguration.current.activeMarket.receivingPaymentsDescription
         descLabel.font = .systemFont(ofSize: 14)
         descLabel.textColor = .secondaryLabel
         descLabel.numberOfLines = 0
@@ -4862,9 +4872,9 @@ class AccountDetailsViewController: UIViewController {
         detailsStack.spacing = 20
         detailsStack.translatesAutoresizingMaskIntoConstraints = false
         
-        let accountNumberRow = createInfoRow(title: "Account number", value: businessAccount.accountNumber)
-        let sortCodeRow = createInfoRow(title: "Sort code", value: businessAccount.sortCode)
-        let bankAddressRow = createInfoRow(title: "Bank address", value: "4th Floor, The Featherstone Building, 66 City Road\nLondon\nEC1Y 2AL")
+        let accountNumberRow = createInfoRow(title: BankConfiguration.current.activeMarket.primaryBankDetailLabel, value: businessAccount.accountNumber)
+        let sortCodeRow = createInfoRow(title: BankConfiguration.current.activeMarket.secondaryBankDetailLabel, value: businessAccount.sortCode)
+        let bankAddressRow = createInfoRow(title: "Bank address", value: BankConfiguration.current.activeMarket.bankAddress)
         
         detailsStack.addArrangedSubview(accountNumberRow)
         detailsStack.addArrangedSubview(sortCodeRow)

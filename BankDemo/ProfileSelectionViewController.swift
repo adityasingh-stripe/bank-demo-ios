@@ -244,7 +244,8 @@ class ProfileSelectionViewController: UIViewController {
     }
 
     private func fetchProfiles() {
-        guard let url = URL(string: "\(AppSettings.shared.selectedServerBaseURL)/api/profiles") else {
+        let market = BankConfiguration.current.market.code
+        guard let url = URL(string: "\(AppSettings.shared.selectedServerBaseURL)/api/profiles?market=\(market)") else {
             profileDetailsLabel.text = "Unable to load profiles."
             return
         }
@@ -402,10 +403,15 @@ class ProfileSelectionViewController: UIViewController {
         if modeControl.selectedSegmentIndex == 0 {
             guard let selectedProfile else { return }
             AppDataManager.shared.currentAccountId = nil
+            AppDataManager.shared.clearAccountContext()
             showDashboard(profile: selectedProfile)
         } else {
             guard let selectedAccount else { return }
             AppDataManager.shared.currentAccountId = selectedAccount.id
+            AppDataManager.shared.setAccountContext(
+                country: selectedAccount.country,
+                currency: selectedAccount.currency
+            )
             showDashboard(profile: nil)
         }
     }
@@ -464,7 +470,7 @@ extension ProfileSelectionViewController: UITableViewDataSource, UITableViewDele
 
         cell.textLabel?.text = account.displayName
         cell.textLabel?.font = .systemFont(ofSize: 16, weight: .semibold)
-        cell.detailTextLabel?.text = "\(formattedDate(account.created)) · acct_…\(idSuffix) · \(readinessText(for: account))"
+        cell.detailTextLabel?.text = "\(formattedDate(account.created)) · \(account.currency.uppercased()) · acct_…\(idSuffix) · \(readinessText(for: account))"
         cell.detailTextLabel?.textColor = .secondaryLabel
         cell.detailTextLabel?.adjustsFontSizeToFitWidth = true
         cell.imageView?.image = UIImage(systemName: "circle.fill")

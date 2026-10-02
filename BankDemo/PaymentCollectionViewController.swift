@@ -104,9 +104,9 @@ class PaymentCollectionViewController: UIViewController {
         
         // Currency symbol
         let currencyLabel = UILabel()
-        currencyLabel.text = "£"
+        currencyLabel.text = BankConfiguration.current.activeMarket.currencySymbol
         currencyLabel.font = UIFont.systemFont(ofSize: 32, weight: .bold)
-        currencyLabel.textColor = UIColor(red: 201/255, green: 43/255, blue: 35/255, alpha: 1)
+        currencyLabel.textColor = BankConfiguration.current.primaryColor
         currencyLabel.translatesAutoresizingMaskIntoConstraints = false
         
         // Editable amount field
@@ -346,7 +346,8 @@ class PaymentCollectionViewController: UIViewController {
         // Convert amount to pence
         let amountInPence = UInt((amountValue * 100).rounded())
         
-        print("INFO: Starting payment collection for \(amountValue) gbp")
+        let market = BankConfiguration.current.activeMarket
+        print("INFO: Starting payment collection for \(amountValue) \(market.currencyCode)")
         
         // Initialize Terminal connection if needed
         if !terminalManager.isConnectedToReader {
@@ -384,7 +385,8 @@ class PaymentCollectionViewController: UIViewController {
     }
     
     private func processPayment(amount: UInt) {
-        terminalManager.collectPayment(amount: amount, currency: "gbp", customer: selectedCustomer) { (result: Result<PaymentIntent, Error>) in
+        let market = BankConfiguration.current.activeMarket
+        terminalManager.collectPayment(amount: amount, currency: market.currencyCode.lowercased(), customer: selectedCustomer) { (result: Result<PaymentIntent, Error>) in
             Task { @MainActor [weak self] in
                 guard let self = self else { return }
                 switch result {
@@ -400,7 +402,10 @@ class PaymentCollectionViewController: UIViewController {
     /// Validates amount input with proper error handling
     private func validateAmount(_ amountText: String) -> Double? {
         // Remove any currency symbols and whitespace
-        let cleanedText = amountText.replacingOccurrences(of: "£", with: "")
+        let cleanedText = amountText.replacingOccurrences(
+            of: BankConfiguration.current.activeMarket.currencySymbol,
+            with: ""
+        )
                                    .replacingOccurrences(of: "$", with: "")
                                    .replacingOccurrences(of: "€", with: "")
                                    .trimmingCharacters(in: .whitespacesAndNewlines)
@@ -439,7 +444,7 @@ class PaymentCollectionViewController: UIViewController {
         // Keep user on TTP screen and show success notification
         let alert = UIAlertController(
             title: "Payment Successful! 🎉",
-            message: String(format: "Payment of £%.2f completed successfully.", chargedAmount),
+            message: "Payment of \(BankConfiguration.current.activeMarket.format(chargedAmount)) completed successfully.",
             preferredStyle: .alert
         )
         

@@ -258,7 +258,8 @@ class TerminalManager: NSObject, ObservableObject, @unchecked Sendable {
     
     // MARK: - Payment Processing
     
-    func collectPayment(amount: UInt, currency: String = "gbp", customer: Customer? = nil, completion: @escaping @Sendable (Result<PaymentIntent, Error>) -> Void) {
+    func collectPayment(amount: UInt, currency requestedCurrency: String? = nil, customer: Customer? = nil, completion: @escaping @Sendable (Result<PaymentIntent, Error>) -> Void) {
+        let currency = requestedCurrency ?? BankConfiguration.current.activeMarket.currencyCode.lowercased()
         print("💳 Terminal SDK: Starting payment collection for \(Double(amount)/100.0) \(currency.uppercased()) \(customer != nil ? "with customer" : "without customer")")
         
         // Clear any existing timeout timers
@@ -645,4 +646,4 @@ extension TerminalManager: TapToPayReaderDelegate {
         isReconnecting = false
         pendingPaymentCompletion = nil
     }
-} 
+}

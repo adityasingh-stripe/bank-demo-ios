@@ -9,6 +9,8 @@ struct ConnectedAccountSummary: Codable, Equatable {
     let id: String
     let displayName: String
     let created: String
+    let country: String
+    let currency: String
     let cardPaymentsStatus: String
     let canTakeCardPayments: Bool?
 }

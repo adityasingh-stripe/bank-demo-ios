@@ -9,6 +9,67 @@
 import UIKit
 import SwiftUI
 
+struct MarketConfiguration: Equatable {
+    let code: String
+    let countryCode: String
+    let currencyCode: String
+    let localeIdentifier: String
+    let primaryBankDetailLabel: String
+    let primaryBankDetailValue: String
+    let secondaryBankDetailLabel: String
+    let secondaryBankDetailValue: String
+    let receivingPaymentsDescription: String
+    let bankAddress: String
+
+    static let unitedKingdom = MarketConfiguration(
+        code: "gb",
+        countryCode: "GB",
+        currencyCode: "GBP",
+        localeIdentifier: "en_GB",
+        primaryBankDetailLabel: "Account number",
+        primaryBankDetailValue: "004923476",
+        secondaryBankDetailLabel: "Sort code",
+        secondaryBankDetailValue: "77-61-27",
+        receivingPaymentsDescription: "These details are for receiving GBP payments from UK accounts",
+        bankAddress: "4th Floor, The Featherstone Building, 66 City Road\nLondon\nEC1Y 2AL"
+    )
+
+    static let ireland = MarketConfiguration(
+        code: "ie",
+        countryCode: "IE",
+        currencyCode: "EUR",
+        localeIdentifier: "en_IE",
+        primaryBankDetailLabel: "IBAN",
+        primaryBankDetailValue: "IE29 AIBK 9311 5212 3456 78",
+        secondaryBankDetailLabel: "BIC",
+        secondaryBankDetailValue: "AIBKIE2D",
+        receivingPaymentsDescription: "These details are for receiving EUR payments through SEPA",
+        bankAddress: "40 Mespil Road\nDublin 4\nD04 C2N4"
+    )
+
+    static func resolve(country: String?, currency: String?) -> MarketConfiguration? {
+        if country?.uppercased() == "IE" || currency?.uppercased() == "EUR" { return .ireland }
+        if country?.uppercased() == "GB" || currency?.uppercased() == "GBP" { return .unitedKingdom }
+        return nil
+    }
+
+    var currencySymbol: String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = currencyCode
+        formatter.locale = Locale(identifier: localeIdentifier)
+        return formatter.currencySymbol ?? currencyCode
+    }
+
+    func format(_ amount: Double) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = currencyCode
+        formatter.locale = Locale(identifier: localeIdentifier)
+        return formatter.string(from: NSNumber(value: amount)) ?? "\(currencySymbol)0.00"
+    }
+}
+
 // MARK: - Payment Fallback Configuration
 enum PaymentFallbackType {
     case checkoutSession    // Use Stripe Checkout Sessions (recommended)
@@ -51,6 +112,7 @@ struct BankConfiguration {
     let businessBankingName: String
     let domainName: String
     let errorDomain: String
+    let market: MarketConfiguration
     
     // MARK: - Payment Configuration
     let paymentFallbackType: PaymentFallbackType
@@ -117,6 +179,13 @@ struct BankConfiguration {
     
     var errorColorSwiftUI: Color {
         return Color(errorColor)
+    }
+
+    var activeMarket: MarketConfiguration {
+        MarketConfiguration.resolve(
+            country: UserDefaults.standard.string(forKey: "ConnectedAccountCountry"),
+            currency: UserDefaults.standard.string(forKey: "ConnectedAccountCurrency")
+        ) ?? market
     }
     
     // MARK: - Helper Methods
@@ -207,9 +276,9 @@ struct BankConfiguration {
         return label
     }
     
-    func amountLabel(amount: Double, currency: String = "£") -> UILabel {
+    func amountLabel(amount: Double) -> UILabel {
         let label = UILabel()
-        label.text = "\(currency)\(String(format: "%.2f", amount))"
+        label.text = activeMarket.format(amount)
         label.font = UIFont.systemFont(ofSize: amountFontSize, weight: .light)
         label.textColor = amountColor
         label.textAlignment = .center
@@ -243,6 +312,7 @@ extension BankConfiguration {
         businessBankingName: "HSBC Business Banking",
         domainName: "hsbc.co.uk",
         errorDomain: "HSBCDemo",
+        market: .unitedKingdom,
         paymentFallbackType: .checkoutSession, // .paymentLink or .checkoutSession
         primaryColor: UIColor(red: 201/255, green: 43/255, blue: 35/255, alpha: 1.0),
         primaryColorLight: UIColor(red: 201/255, green: 43/255, blue: 35/255, alpha: 0.1),
@@ -287,6 +357,7 @@ extension BankConfiguration {
         businessBankingName: "Lloyds Business Banking",
         domainName: "lloydsbank.com",
         errorDomain: "LloydsDemo",
+        market: .unitedKingdom,
         paymentFallbackType: .checkoutSession,
         primaryColor: UIColor(red: 0/255, green: 98/255, blue: 65/255, alpha: 1.0),
         primaryColorLight: UIColor(red: 0/255, green: 98/255, blue: 65/255, alpha: 0.1),
@@ -331,6 +402,7 @@ extension BankConfiguration {
         businessBankingName: "Barclays Business Banking",
         domainName: "barclays.co.uk",
         errorDomain: "BarclaysDemo",
+        market: .unitedKingdom,
         paymentFallbackType: .checkoutSession,
         primaryColor: UIColor(red: 0/255, green: 174/255, blue: 239/255, alpha: 1.0),
         primaryColorLight: UIColor(red: 0/255, green: 174/255, blue: 239/255, alpha: 0.1),
@@ -375,6 +447,7 @@ extension BankConfiguration {
         businessBankingName: "Bank of Ireland Business Banking",
         domainName: "bankofireland.com",
         errorDomain: "BankOfIrelandDemo",
+        market: .ireland,
         paymentFallbackType: .checkoutSession,
         primaryColor: UIColor(red: 0/255, green: 51/255, blue: 204/255, alpha: 1.0),
         primaryColorLight: UIColor(red: 0/255, green: 51/255, blue: 204/255, alpha: 0.1),
