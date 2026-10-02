@@ -30,6 +30,7 @@
 		416E9EDA2C78BDC300A0B917 /* AccountSessionResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 416E9ED92C78BDC300A0B917 /* AccountSessionResponse.swift */; };
 		416E9EDC2C78BE1300A0B917 /* APIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 416E9EDB2C78BE1300A0B917 /* APIError.swift */; };
 		416E9EDE2C78C0BA00A0B917 /* AppInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 416E9EDD2C78C0BA00A0B917 /* AppInfo.swift */; };
+		B20000000000000000000002 /* ConnectedAccountsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000001 /* ConnectedAccountsResponse.swift */; };
 		416E9EE02C78C10800A0B917 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 416E9EDF2C78C10800A0B917 /* MainViewController.swift */; };
 		416E9EE12C78C10900A0B917 /* BankTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 416E9EE02C78C10900A0B917 /* BankTabBarController.swift */; };
 		PS001234567890123456 /* ProfileSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = PS001234567890123457 /* ProfileSelectionViewController.swift */; };
@@ -109,6 +110,7 @@
 		416E9ED92C78BDC300A0B917 /* AccountSessionResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSessionResponse.swift; sourceTree = "<group>"; };
 		416E9EDB2C78BE1300A0B917 /* APIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIError.swift; sourceTree = "<group>"; };
 		416E9EDD2C78C0BA00A0B917 /* AppInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInfo.swift; sourceTree = "<group>"; };
+		B20000000000000000000001 /* ConnectedAccountsResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectedAccountsResponse.swift; sourceTree = "<group>"; };
 		416E9EDF2C78C10800A0B917 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		416E9EE02C78C10900A0B917 /* BankTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BankTabBarController.swift; sourceTree = "<group>"; };
 		PS001234567890123457 /* ProfileSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSelectionViewController.swift; sourceTree = "<group>"; };
@@ -289,6 +291,7 @@
 				416E9ED92C78BDC300A0B917 /* AccountSessionResponse.swift */,
 				416E9EDB2C78BE1300A0B917 /* APIError.swift */,
 				416E9EDD2C78C0BA00A0B917 /* AppInfo.swift */,
+				B20000000000000000000001 /* ConnectedAccountsResponse.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -481,6 +484,7 @@
 				4161C2852C9DC235005BD67C /* OnboardingSettings.swift in Sources */,
 				41E9A1BD2C7CC85100EDE131 /* SwiftUIContainerViewController.swift in Sources */,
 				416E9EDE2C78C0BA00A0B917 /* AppInfo.swift in Sources */,
+				B20000000000000000000002 /* ConnectedAccountsResponse.swift in Sources */,
 				41810D762C8A005D00F10EB7 /* AppearanceInfo.swift in Sources */,
 				41810D712C89F4CD00F10EB7 /* AppearanceSettings.swift in Sources */,
 

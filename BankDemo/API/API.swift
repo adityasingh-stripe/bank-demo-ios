@@ -30,6 +30,17 @@ struct API {
                          baseURL: actualBaseURL)
     }
 
+    static func connectedAccounts(baseURL: String? = nil) async -> Result<ConnectedAccountsResponse, APIError> {
+        let actualBaseURL: String
+        if let baseURL = baseURL {
+            actualBaseURL = baseURL
+        } else {
+            actualBaseURL = await AppSettings.shared.selectedServerBaseURL
+        }
+
+        return await apiRequest(path: "api/accounts", baseURL: actualBaseURL)
+    }
+
     static func apiRequest<Response: Codable>(path: String,
                                               method: String = "GET",
                                               headers: [String: String] = [:],
