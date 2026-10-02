@@ -33,6 +33,7 @@
 		B20000000000000000000002 /* ConnectedAccountsResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000001 /* ConnectedAccountsResponse.swift */; };
 		416E9EE02C78C10800A0B917 /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 416E9EDF2C78C10800A0B917 /* MainViewController.swift */; };
 		416E9EE12C78C10900A0B917 /* BankTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 416E9EE02C78C10900A0B917 /* BankTabBarController.swift */; };
+		C30000000000000000000002 /* TerminalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C30000000000000000000001 /* TerminalViewController.swift */; };
 		PS001234567890123456 /* ProfileSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = PS001234567890123457 /* ProfileSelectionViewController.swift */; };
 		PC001234567890123459 /* PaymentCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = PC001234567890123458 /* PaymentCollectionViewController.swift */; };
 		416E9EE32C7B988100A0B917 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 416E9EE22C7B988100A0B917 /* AppSettings.swift */; };
@@ -113,6 +114,7 @@
 		B20000000000000000000001 /* ConnectedAccountsResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectedAccountsResponse.swift; sourceTree = "<group>"; };
 		416E9EDF2C78C10800A0B917 /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		416E9EE02C78C10900A0B917 /* BankTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BankTabBarController.swift; sourceTree = "<group>"; };
+		C30000000000000000000001 /* TerminalViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerminalViewController.swift; sourceTree = "<group>"; };
 		PS001234567890123457 /* ProfileSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSelectionViewController.swift; sourceTree = "<group>"; };
 		PC001234567890123458 /* PaymentCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentCollectionViewController.swift; sourceTree = "<group>"; };
 		416E9EE22C7B988100A0B917 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
@@ -247,6 +249,7 @@
 				CS001234567890123457 /* CheckoutSessionViewController.swift */,
 				QR001234567890123457 /* QRCodeViewController.swift */,
 				416E9EE02C78C10900A0B917 /* BankTabBarController.swift */,
+				C30000000000000000000001 /* TerminalViewController.swift */,
 				TM001T5C1234567890123456 /* TerminalManager.swift */,
 				EN001T6C1234567890123456 /* BankDemo.entitlements */,
 				D9FC5F1DAFA5479F8C11D225 /* BankConfiguration.swift */,
@@ -497,6 +500,7 @@
 				CS001234567890123456 /* CheckoutSessionViewController.swift in Sources */,
 				QR001234567890123456 /* QRCodeViewController.swift in Sources */,
 				416E9EE12C78C10900A0B917 /* BankTabBarController.swift in Sources */,
+				C30000000000000000000002 /* TerminalViewController.swift in Sources */,
 				TM001T4C1234567890123456 /* TerminalManager.swift in Sources */,
 				47C8B71904CB4EFFAE72C1DE /* BankConfiguration.swift in Sources */,
 				B10000000000000000000002 /* SelectedBankConfiguration.generated.swift in Sources */,

@@ -39,13 +39,13 @@ class BankTabBarController: UITabBarController {
             selectedImage: UIImage(systemName: "arrow.down.circle.fill")
         )
         
-        // Finance tab - Financial tools and services
-        let financeVC = FinanceViewController()
-        let financeNav = UINavigationController(rootViewController: financeVC)
-        financeNav.tabBarItem = UITabBarItem(
-            title: "Finance",
-            image: UIImage(systemName: "chart.line.uptrend.xyaxis"),
-            selectedImage: UIImage(systemName: "chart.line.uptrend.xyaxis")
+        // Terminal tab - hardware ordering and reader registration
+        let terminalVC = TerminalViewController()
+        let terminalNav = UINavigationController(rootViewController: terminalVC)
+        terminalNav.tabBarItem = UITabBarItem(
+            title: "Terminal",
+            image: UIImage(systemName: "creditcard.and.123"),
+            selectedImage: UIImage(systemName: "creditcard.and.123")
         )
         
         // Support tab
@@ -57,7 +57,7 @@ class BankTabBarController: UITabBarController {
             selectedImage: UIImage(systemName: "questionmark.circle.fill")
         )
         
-        viewControllers = [homeNav, paymentsNav, payoutsNav, financeNav, supportNav]
+        viewControllers = [homeNav, paymentsNav, payoutsNav, terminalNav, supportNav]
     }
     
     private func setupAppearance() {
@@ -1045,25 +1045,3 @@ extension BankingDashboardViewController: PaymentsViewControllerDelegate {
         print("Embedded payments failed to load in dashboard: \(error.localizedDescription)")
     }
 }
-
-// MARK: - FinanceViewController  
-class FinanceViewController: UIViewController {
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .systemGroupedBackground
-        title = "Finance"
-        
-        let label = UILabel()
-        label.text = "Financial tools and insights coming soon"
-        label.textAlignment = .center
-        label.textColor = .secondaryLabel
-        label.font = .systemFont(ofSize: 18)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        
-        view.addSubview(label)
-        NSLayoutConstraint.activate([
-            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            label.centerYAnchor.constraint(equalTo: view.centerYAnchor)
-        ])
-    }
-} 
