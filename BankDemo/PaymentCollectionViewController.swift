@@ -345,6 +345,9 @@ class PaymentCollectionViewController: UIViewController {
         
         // Convert amount to pence
         let amountInPence = UInt((amountValue * 100).rounded())
+        let enteredDescription = descriptionTextView.text
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let paymentDescription = enteredDescription.isEmpty ? nil : enteredDescription
         
         let market = BankConfiguration.current.activeMarket
         print("INFO: Starting payment collection for \(amountValue) \(market.currencyCode)")
@@ -354,14 +357,17 @@ class PaymentCollectionViewController: UIViewController {
             connectToSimulatedReader { [weak self] success in
                 Task { @MainActor in
                     if success {
-                        self?.processPayment(amount: amountInPence)
+                        self?.processPayment(
+                            amount: amountInPence,
+                            description: paymentDescription
+                        )
                     } else {
                         self?.resetCollectPaymentButton()
                     }
                 }
             }
         } else {
-            processPayment(amount: amountInPence)
+            processPayment(amount: amountInPence, description: paymentDescription)
         }
     }
     
@@ -384,9 +390,14 @@ class PaymentCollectionViewController: UIViewController {
         }
     }
     
-    private func processPayment(amount: UInt) {
+    private func processPayment(amount: UInt, description: String?) {
         let market = BankConfiguration.current.activeMarket
-        terminalManager.collectPayment(amount: amount, currency: market.currencyCode.lowercased(), customer: selectedCustomer) { (result: Result<PaymentIntent, Error>) in
+        terminalManager.collectPayment(
+            amount: amount,
+            currency: market.currencyCode.lowercased(),
+            customer: selectedCustomer,
+            description: description
+        ) { (result: Result<PaymentIntent, Error>) in
             Task { @MainActor [weak self] in
                 guard let self = self else { return }
                 switch result {

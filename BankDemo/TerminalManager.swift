@@ -258,7 +258,7 @@ class TerminalManager: NSObject, ObservableObject, @unchecked Sendable {
     
     // MARK: - Payment Processing
     
-    func collectPayment(amount: UInt, currency requestedCurrency: String? = nil, customer: Customer? = nil, completion: @escaping @Sendable (Result<PaymentIntent, Error>) -> Void) {
+    func collectPayment(amount: UInt, currency requestedCurrency: String? = nil, customer: Customer? = nil, description: String? = nil, completion: @escaping @Sendable (Result<PaymentIntent, Error>) -> Void) {
         let currency = requestedCurrency ?? BankConfiguration.current.activeMarket.currencyCode.lowercased()
         print("💳 Terminal SDK: Starting payment collection for \(Double(amount)/100.0) \(currency.uppercased()) \(customer != nil ? "with customer" : "without customer")")
         
@@ -272,12 +272,12 @@ class TerminalManager: NSObject, ObservableObject, @unchecked Sendable {
         guard isConnectedToReader else {
             print("Not connected to reader - attempting auto-reconnect")
             // Auto-reconnect and retry payment
-            reconnectAndRetryPayment(amount: amount, currency: currency, customer: customer, completion: completion)
+            reconnectAndRetryPayment(amount: amount, currency: currency, customer: customer, description: description, completion: completion)
             return
         }
         
         // Step 1: Create PaymentIntent using Terminal SDK
-        createPaymentIntent(amount: amount, currency: currency, customer: customer) { [weak self] (result: Result<PaymentIntent, Error>) in
+        createPaymentIntent(amount: amount, currency: currency, customer: customer, description: description) { [weak self] (result: Result<PaymentIntent, Error>) in
             switch result {
             case .success(let paymentIntent):
                 // Step 2: Collect payment method
@@ -286,7 +286,7 @@ class TerminalManager: NSObject, ObservableObject, @unchecked Sendable {
                 // Check if error is due to connection issues
                 if self?.isConnectionError(error) == true {
                     print("Connection error detected, attempting reconnection...")
-                    self?.reconnectAndRetryPayment(amount: amount, currency: currency, customer: customer, completion: completion)
+                    self?.reconnectAndRetryPayment(amount: amount, currency: currency, customer: customer, description: description, completion: completion)
                 } else {
                     self?.clearTimeoutTimers()
                     completion(.failure(error))
@@ -295,7 +295,7 @@ class TerminalManager: NSObject, ObservableObject, @unchecked Sendable {
         }
     }
     
-    private func reconnectAndRetryPayment(amount: UInt, currency: String, customer: Customer? = nil, completion: @escaping @Sendable (Result<PaymentIntent, Error>) -> Void) {
+    private func reconnectAndRetryPayment(amount: UInt, currency: String, customer: Customer? = nil, description: String? = nil, completion: @escaping @Sendable (Result<PaymentIntent, Error>) -> Void) {
         guard !isReconnecting else {
             completion(.failure(NSError(domain: BankConfiguration.current.errorDomain, code: -1, userInfo: [NSLocalizedDescriptionKey: "Already reconnecting..."])))
             return
@@ -321,7 +321,7 @@ class TerminalManager: NSObject, ObservableObject, @unchecked Sendable {
                 
                 // Connection successful, retry payment
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    self?.collectPayment(amount: amount, currency: currency, customer: customer, completion: completion)
+                    self?.collectPayment(amount: amount, currency: currency, customer: customer, description: description, completion: completion)
                 }
             case .failure(let error):
                 self?.clearTimeoutTimers()
@@ -340,7 +340,7 @@ class TerminalManager: NSObject, ObservableObject, @unchecked Sendable {
                errorString.contains("pss_test")
     }
     
-    nonisolated private func createPaymentIntent(amount: UInt, currency: String, customer: Customer? = nil, completion: @escaping @Sendable (Result<PaymentIntent, Error>) -> Void) {
+    nonisolated private func createPaymentIntent(amount: UInt, currency: String, customer: Customer? = nil, description: String? = nil, completion: @escaping @Sendable (Result<PaymentIntent, Error>) -> Void) {
         // Create PaymentIntent via backend
         // then retrieve it using Terminal SDK
         Task { @MainActor in
@@ -365,6 +365,10 @@ class TerminalManager: NSObject, ObservableObject, @unchecked Sendable {
             "capture_method": "automatic",
             "account_id": accountId
         ]
+
+        if let description, !description.isEmpty {
+            body["description"] = description
+        }
         
         // Add customer information if provided
         if let customer = customer {
